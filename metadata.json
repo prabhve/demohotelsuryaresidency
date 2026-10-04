@@ -1,0 +1,6 @@
+{
+  "name": "Hotel Surya Residency - Singrauli",
+  "description": "Official luxury stays, dining, and banquet booking portal for Hotel Surya Residency in Vindhya Nagar, Singrauli (M.P.). Instant WhatsApp booking and reservation management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
