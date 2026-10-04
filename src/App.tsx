@@ -13,6 +13,8 @@ import { LocationSection } from './components/LocationSection';
 import { ReviewsSection } from './components/ReviewsSection';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Footer } from './components/Footer';
+import { BackToTop } from './components/BackToTop';
+import { MobileStickyBottomBar } from './components/MobileStickyBottomBar';
 import { MessageSquare } from 'lucide-react';
 
 export default function App() {
@@ -114,7 +116,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 selection:bg-amber-500 selection:text-stone-950 font-sans-modern">
+    <div className="min-h-screen bg-stone-950 text-stone-100 selection:bg-amber-500 selection:text-stone-950 font-sans-modern pb-16 md:pb-0">
       {/* Navigation */}
       <Navbar
         settings={cmsData.settings}
@@ -181,6 +183,9 @@ export default function App() {
         currentLang={currentLang}
       />
 
+      {/* Floating Back to Top Button */}
+      <BackToTop />
+
       {/* Floating Direct WhatsApp Button */}
       <a
         href={`https://wa.me/${cmsData.settings.whatsappNumber.replace(
@@ -189,12 +194,18 @@ export default function App() {
         )}?text=Hello%20Hotel%20Surya%20Residency,%20I%20would%20like%20to%20book%20a%20room`}
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-stone-950 flex items-center justify-center shadow-2xl hover:scale-110 transition-all cursor-pointer shadow-emerald-500/30"
+        className="hidden md:flex fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 text-stone-950 items-center justify-center shadow-2xl hover:scale-110 transition-all cursor-pointer shadow-emerald-500/30"
         aria-label="Direct WhatsApp Message"
         title="Direct WhatsApp Front Desk"
       >
         <MessageSquare className="w-7 h-7 fill-stone-950" />
       </a>
+
+      {/* Mobile-Friendly Sticky Bottom Bar for Small Devices */}
+      <MobileStickyBottomBar
+        settings={cmsData.settings}
+        onOpenBookingModal={() => handleOpenBookingModal()}
+      />
     </div>
   );
 }

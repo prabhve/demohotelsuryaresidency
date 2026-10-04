@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, MessageSquare, MapPin, ShieldCheck, Menu, X, Sparkles, Clock } from 'lucide-react';
+import { Phone, MessageSquare, MapPin, ShieldCheck, Menu, X, Sparkles, Clock, ArrowRight } from 'lucide-react';
 import { HotelSettings } from '../types/hotel';
 
 interface NavbarProps {
@@ -24,46 +24,44 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-50 w-full transition-all duration-300">
-      {/* Top Refined Information Bar */}
-      <div className="bg-stone-950/98 border-b border-stone-800/80 text-[11px] sm:text-xs py-2 px-4 text-stone-300">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* Left Side: Address & Assurance */}
-          <div className="flex items-center gap-3 overflow-hidden">
-            <span className="flex items-center gap-1.5 text-amber-400/90 font-medium whitespace-nowrap truncate">
-              <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Behind Shivaji Complex, Navjeevan Vihar, Vindhya Nagar, Singrauli</span>
+      {/* Top Refined Information Bar - Perfectly Responsive */}
+      <div className="bg-stone-950/98 border-b border-stone-800/80 text-[11px] sm:text-xs py-1.5 px-3 sm:px-4 text-stone-300">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+          {/* Location & Landmark */}
+          <div className="flex items-center gap-1.5 sm:gap-3 truncate">
+            <span className="flex items-center gap-1 text-amber-400 font-medium whitespace-nowrap text-[11px] sm:text-xs">
+              <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
+              <span className="hidden sm:inline">Behind Shivaji Complex, Navjeevan Vihar, Vindhya Nagar</span>
+              <span className="sm:hidden">Vindhya Nagar, Singrauli</span>
             </span>
-            <span className="hidden lg:inline-flex items-center gap-1.5 text-stone-400 border-l border-stone-800 pl-3 whitespace-nowrap">
+            <span className="hidden md:inline-flex items-center gap-1 text-stone-400 border-l border-stone-800 pl-3 whitespace-nowrap text-[11px]">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>100% 24/7 Power Backup</span>
+              <span>24/7 Power Backup</span>
             </span>
           </div>
 
-          {/* Right Side: Timings & Direct Contact */}
-          <div className="flex items-center gap-3.5 shrink-0">
-            <span className="hidden md:inline-flex items-center gap-1.5 text-stone-400 whitespace-nowrap">
-              <Clock className="w-3.5 h-3.5 text-amber-400/80 shrink-0" />
-              <span>In: 12 PM | Out: 11 AM</span>
-            </span>
-
-            <span className="hidden md:inline-block w-1 h-1 rounded-full bg-stone-700"></span>
-
+          {/* Quick Direct Desk Action */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <a
               href={`tel:${settings.phonePrimary}`}
-              className="flex items-center gap-1.5 text-stone-200 hover:text-amber-400 transition-colors font-semibold whitespace-nowrap"
+              className="flex items-center gap-1 text-stone-200 hover:text-amber-400 transition-colors font-semibold text-[11px] sm:text-xs whitespace-nowrap"
             >
               <Phone className="w-3 h-3 text-amber-400 shrink-0" />
-              <span>{settings.phonePrimary}</span>
+              <span className="hidden xs:inline">{settings.phonePrimary}</span>
+              <span className="xs:hidden">Call</span>
             </a>
 
             <a
-              href={`https://wa.me/${settings.whatsappNumber.replace(/[^0-9]/g, '')}?text=Hello%20Hotel%20Surya%20Residency,%20I%20have%20an%20inquiry%20regarding%20room%20booking`}
+              href={`https://wa.me/${settings.whatsappNumber.replace(
+                /[^0-9]/g,
+                ''
+              )}?text=Hello%20Hotel%20Surya%20Residency,%20I%20have%20an%20inquiry%20regarding%20room%20booking`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-semibold bg-emerald-950/50 hover:bg-emerald-900/50 px-2.5 py-0.5 rounded-full border border-emerald-700/50 transition-colors whitespace-nowrap"
+              className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-semibold bg-emerald-950/60 hover:bg-emerald-900/60 px-2 py-0.5 rounded-full border border-emerald-700/50 transition-colors text-[10px] sm:text-[11px] whitespace-nowrap"
             >
-              <MessageSquare className="w-3 h-3 shrink-0" />
-              <span>WhatsApp Desk</span>
+              <MessageSquare className="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" />
+              <span>WhatsApp</span>
             </a>
           </div>
         </div>
@@ -73,31 +71,31 @@ export const Navbar: React.FC<NavbarProps> = ({
       <nav
         className={`w-full transition-all duration-300 ${
           isScrolled
-            ? 'bg-stone-950/95 backdrop-blur-md shadow-2xl border-b border-amber-500/20 py-2.5'
-            : 'bg-stone-950/90 backdrop-blur-sm py-3.5 border-b border-stone-900'
+            ? 'bg-stone-950/95 backdrop-blur-md shadow-2xl border-b border-amber-500/20 py-2 sm:py-2.5'
+            : 'bg-stone-950/90 backdrop-blur-sm py-2.5 sm:py-3.5 border-b border-stone-900'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-          {/* Brand Logo */}
-          <a href="#" className="flex items-center gap-3 group shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-600 to-amber-800 p-0.5 shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
+          {/* Brand Logo & Name */}
+          <a href="#" className="flex items-center gap-2 sm:gap-3 group shrink-0 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-600 to-amber-800 p-0.5 shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
               <div className="w-full h-full bg-stone-950 rounded-[10px] flex items-center justify-center">
-                <span className="font-serif-luxury text-xl font-bold bg-gradient-to-br from-amber-200 via-amber-400 to-amber-500 bg-clip-text text-transparent">
+                <span className="font-serif-luxury text-base sm:text-xl font-bold bg-gradient-to-br from-amber-200 via-amber-400 to-amber-500 bg-clip-text text-transparent">
                   S
                 </span>
               </div>
             </div>
-            <div className="whitespace-nowrap">
-              <div className="font-serif-luxury text-base sm:text-lg font-bold tracking-wider text-stone-100 group-hover:text-amber-300 transition-colors leading-tight">
+            <div className="truncate">
+              <div className="font-serif-luxury text-xs sm:text-base lg:text-lg font-bold tracking-wider text-stone-100 group-hover:text-amber-300 transition-colors leading-tight truncate">
                 HOTEL SURYA RESIDENCY
               </div>
-              <div className="text-[10px] tracking-[0.18em] text-amber-400 font-semibold uppercase leading-tight mt-0.5">
-                Vindhya Nagar • Singrauli (M.P.)
+              <div className="text-[8px] sm:text-[10px] tracking-[0.14em] sm:tracking-[0.18em] text-amber-400 font-semibold uppercase leading-tight mt-0.5 truncate">
+                Vindhya Nagar • Singrauli
               </div>
             </div>
           </a>
 
-          {/* Desktop Navigation Links */}
+          {/* Desktop Navigation Links (Large Screens) */}
           <div className="hidden lg:flex items-center gap-5 xl:gap-7 text-[13px] font-medium text-stone-300 shrink-0">
             <a
               href="#rooms"
@@ -143,31 +141,22 @@ export const Navbar: React.FC<NavbarProps> = ({
             </a>
           </div>
 
-          {/* Right Action Button */}
-          <div className="hidden sm:flex items-center shrink-0">
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Direct Booking CTA */}
             <button
               onClick={onOpenBookingModal}
-              className="relative group overflow-hidden rounded-full p-px font-semibold text-xs tracking-wide cursor-pointer shadow-lg shadow-amber-500/15 whitespace-nowrap"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-[11px] sm:text-xs tracking-wide shadow-md shadow-amber-500/20 active:scale-95 transition-all whitespace-nowrap flex items-center gap-1"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 rounded-full group-hover:opacity-100 transition-opacity"></span>
-              <span className="relative flex items-center gap-2 px-4 xl:px-5 py-2 rounded-full bg-stone-950 text-amber-300 group-hover:bg-transparent group-hover:text-stone-950 transition-all font-bold whitespace-nowrap">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400 group-hover:text-stone-950 shrink-0" />
-                <span>Book Direct (Save 10%)</span>
-              </span>
+              <Sparkles className="w-3 h-3 fill-stone-950 shrink-0" />
+              <span className="hidden sm:inline">Book Direct (10% Off)</span>
+              <span className="sm:hidden">Book Now</span>
             </button>
-          </div>
 
-          {/* Mobile hamburger menu toggle */}
-          <div className="flex items-center gap-2 lg:hidden">
-            <button
-              onClick={onOpenBookingModal}
-              className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 text-xs font-bold sm:hidden shadow-md whitespace-nowrap"
-            >
-              Book Now
-            </button>
+            {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-300 hover:text-amber-400"
+              className="p-1.5 sm:p-2 rounded-xl bg-stone-900 border border-stone-800 text-stone-300 hover:text-amber-400 lg:hidden cursor-pointer"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -175,58 +164,58 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Mobile Dropdown Menu */}
+        {/* Mobile Dropdown Menu Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-stone-950/98 border-b border-stone-800 px-4 pt-3 pb-6 mt-3 space-y-3 shadow-2xl">
-            <div className="grid grid-cols-2 gap-2 text-sm font-medium text-stone-300">
+          <div className="lg:hidden bg-stone-950/98 border-b border-stone-800 px-4 pt-3 pb-6 mt-2 space-y-3 shadow-2xl animate-in slide-in-from-top-2">
+            <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-stone-300">
               <a
                 href="#rooms"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-stone-900/60 hover:bg-stone-900 text-stone-200"
+                className="p-2.5 rounded-xl bg-stone-900/80 hover:bg-stone-800 text-stone-200 border border-stone-800/80"
               >
-                Rooms & Suites
+                🏨 Rooms & Suites
               </a>
               <a
                 href="#amenities"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-stone-900/60 hover:bg-stone-900 text-stone-200"
+                className="p-2.5 rounded-xl bg-stone-900/80 hover:bg-stone-800 text-stone-200 border border-stone-800/80"
               >
-                Amenities
+                ⚡ Amenities
               </a>
               <a
                 href="#restaurant"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-stone-900/60 hover:bg-stone-900 text-stone-200"
+                className="p-2.5 rounded-xl bg-stone-900/80 hover:bg-stone-800 text-stone-200 border border-stone-800/80"
               >
-                Surya Rasoi
+                🍽️ Surya Rasoi
               </a>
               <a
                 href="#banquet"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-stone-900/60 hover:bg-stone-900 text-stone-200"
+                className="p-2.5 rounded-xl bg-stone-900/80 hover:bg-stone-800 text-stone-200 border border-stone-800/80"
               >
-                Banquets & Events
+                🎉 Banquets & Events
               </a>
               <a
                 href="#gallery"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-stone-900/60 hover:bg-stone-900 text-stone-200"
+                className="p-2.5 rounded-xl bg-stone-900/80 hover:bg-stone-800 text-stone-200 border border-stone-800/80"
               >
-                Gallery
+                📸 Photo Gallery
               </a>
               <a
                 href="#location"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-stone-900/60 hover:bg-stone-900 text-stone-200"
+                className="p-2.5 rounded-xl bg-stone-900/80 hover:bg-stone-800 text-stone-200 border border-stone-800/80"
               >
-                Location & Map
+                📍 Location & Routes
               </a>
               <a
                 href="#reviews"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-xl bg-stone-900/60 hover:bg-stone-900 text-stone-200 col-span-2"
+                className="p-2.5 rounded-xl bg-stone-900/80 hover:bg-stone-800 text-stone-200 border border-stone-800/80 col-span-2 text-center"
               >
-                Guest Reviews
+                ⭐ Verified Guest Reviews (4.2/5)
               </a>
             </div>
 
@@ -236,9 +225,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setMobileMenuOpen(false);
                   onOpenBookingModal();
                 }}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold text-sm text-center shadow-lg shadow-amber-500/20"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold text-xs text-center shadow-lg shadow-amber-500/20 cursor-pointer"
               >
-                Book Direct (Save 10%)
+                Book Direct with 10% Discount (Code: SURYA10)
               </button>
 
               <div className="grid grid-cols-2 gap-2">
@@ -250,7 +239,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span>Call Reception</span>
                 </a>
                 <a
-                  href={`https://wa.me/${settings.whatsappNumber.replace(/[^0-9]/g, '')}?text=Hello%20Hotel%20Surya%20Residency,%20I%20need%20room%20details`}
+                  href={`https://wa.me/${settings.whatsappNumber.replace(
+                    /[^0-9]/g,
+                    ''
+                  )}?text=Hello%20Hotel%20Surya%20Residency,%20I%20need%20room%20details`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="py-2.5 rounded-xl bg-emerald-950/80 border border-emerald-600/40 text-emerald-300 font-semibold text-xs flex items-center justify-center gap-1.5"

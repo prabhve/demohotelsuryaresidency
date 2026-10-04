@@ -48,7 +48,8 @@ import {
   AlertCircle,
   LayoutDashboard,
   Sliders,
-  RotateCcw
+  RotateCcw,
+  Menu
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -80,6 +81,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onBackToGuestView,
 }) => {
   const [activeTab, setActiveTab] = useState<SidebarTab>('overview');
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -101,7 +103,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [walkinAdults, setWalkinAdults] = useState(1);
   const [walkinAssignedRoom, setWalkinAssignedRoom] = useState('Room 101');
   const [walkinPrice, setWalkinPrice] = useState(1850);
-  const [walkinPaymentStatus, setWalkinPaymentStatus] = useState<'pending_at_desk' | 'advance_paid' | 'fully_paid'>('fully_paid');
+  const [walkinPaymentStatus, setWalkinPaymentStatus] = useState<
+    'pending_at_desk' | 'advance_paid' | 'fully_paid'
+  >('fully_paid');
 
   // Local Editable States for CMS
   const [localHero, setLocalHero] = useState<HeroContent>(cmsData.hero);
@@ -162,6 +166,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   useEffect(() => {
     fetchBookingsAndInquiries();
   }, []);
+
+  const handleSelectTab = (tab: SidebarTab) => {
+    setActiveTab(tab);
+    setMobileDrawerOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Update booking status
   const handleUpdateBookingStatus = async (
@@ -240,7 +250,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       if (data.success) {
         setBookings([data.data, ...bookings]);
         showNotification('Walk-in booking created and guest checked in!');
-        setActiveTab('bookings');
+        handleSelectTab('bookings');
         setWalkinGuestName('');
         setWalkinPhone('');
       }
@@ -415,7 +425,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Analytics Stats
   const totalRevenue = bookings.reduce((sum, b) => (b.status !== 'cancelled' ? sum + b.totalAmount : sum), 0);
-  const pendingCount = bookings.filter((b) => b.status === 'pending').length;
   const checkedInCount = bookings.filter((b) => b.status === 'checked_in').length;
   const inquiriesCount = inquiries.filter((i) => i.status === 'new').length;
 
@@ -441,6 +450,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     { id: 'settings_cms', label: 'Hotel & WhatsApp Config', icon: Settings, group: 'cms' },
   ];
 
+  const currentActiveItem = sidebarMenuItems.find((m) => m.id === activeTab);
+
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col md:flex-row font-sans">
       {/* Toast Notification */}
@@ -451,40 +462,76 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       )}
 
-      {/* LEFT SIDEBAR NAVIGATION */}
-      <aside className="w-full md:w-72 bg-stone-900/95 border-r border-stone-800 flex flex-col justify-between shrink-0 p-4 min-h-screen">
+      {/* MOBILE TOP BAR (Visible only on mobile/tablet screens) */}
+      <header className="md:hidden sticky top-0 z-40 bg-stone-900 border-b border-stone-800 p-3 flex items-center justify-between shadow-lg">
+        <button
+          onClick={() => setMobileDrawerOpen(true)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-950 border border-amber-500/40 text-amber-300 font-bold text-xs"
+        >
+          <Menu className="w-4 h-4 text-amber-400" />
+          <span>{currentActiveItem?.label || 'Menu'}</span>
+          <ChevronDown className="w-3.5 h-3.5 text-stone-400" />
+        </button>
+
+        <button
+          onClick={onBackToGuestView}
+          className="px-3 py-1.5 rounded-xl bg-amber-500 text-stone-950 text-xs font-bold flex items-center gap-1 shadow-md"
+        >
+          <span>Exit Admin</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </button>
+      </header>
+
+      {/* DESKTOP PERSISTENT LEFT SIDEBAR + MOBILE SLIDE-OUT DRAWER */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 md:static w-72 bg-stone-900/98 md:bg-stone-900/95 border-r border-stone-800 flex flex-col justify-between shrink-0 p-4 transition-transform duration-300 ease-in-out ${
+          mobileDrawerOpen
+            ? 'translate-x-0 shadow-2xl'
+            : '-translate-x-full md:translate-x-0'
+        }`}
+      >
         <div>
           {/* Brand Header in Sidebar */}
-          <div className="flex items-center gap-3 pb-5 mb-4 border-b border-stone-800">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-600 to-amber-800 p-0.5 shadow-md flex items-center justify-center shrink-0">
-              <div className="w-full h-full bg-stone-950 rounded-[10px] flex items-center justify-center font-serif-luxury font-bold text-lg text-amber-400">
-                S
+          <div className="flex items-center justify-between pb-4 mb-3 border-b border-stone-800">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-700 p-0.5 shadow-md flex items-center justify-center shrink-0">
+                <div className="w-full h-full bg-stone-950 rounded-[9px] flex items-center justify-center font-serif-luxury font-bold text-base text-amber-400">
+                  S
+                </div>
+              </div>
+              <div>
+                <h2 className="font-serif-luxury text-sm font-bold text-stone-100 tracking-wider">
+                  SURYA CONTROL
+                </h2>
+                <span className="text-[9px] text-amber-400 font-semibold block uppercase">
+                  A-to-Z Hotel CMS & PMS
+                </span>
               </div>
             </div>
-            <div>
-              <h2 className="font-serif-luxury text-sm font-bold text-stone-100 tracking-wider">
-                SURYA CONTROL
-              </h2>
-              <span className="text-[10px] text-amber-400 font-semibold block uppercase">
-                A-to-Z Hotel CMS & PMS
-              </span>
-            </div>
+
+            {/* Mobile close button */}
+            <button
+              onClick={() => setMobileDrawerOpen(false)}
+              className="md:hidden p-1.5 rounded-lg text-stone-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Quick Return to Website button */}
           <button
             onClick={onBackToGuestView}
-            className="w-full py-2 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500 text-amber-300 hover:text-stone-950 border border-amber-500/30 text-xs font-bold transition-all flex items-center justify-between mb-5 cursor-pointer"
+            className="w-full py-2 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500 text-amber-300 hover:text-stone-950 border border-amber-500/30 text-xs font-bold transition-all flex items-center justify-between mb-4 cursor-pointer"
           >
             <span>Back to Guest Website</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
 
           {/* Sidebar Menu Groups */}
-          <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-220px)] pr-1">
+          <div className="space-y-5 overflow-y-auto max-h-[calc(100vh-210px)] pr-1">
             {/* Group 1: Front Desk Operations */}
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 block px-3 mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 block px-2.5 mb-1.5">
                 Front Desk Operations
               </span>
               <div className="space-y-1">
@@ -496,14 +543,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     return (
                       <button
                         key={item.id}
-                        onClick={() => setActiveTab(item.id)}
-                        className={`w-full py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
+                        onClick={() => handleSelectTab(item.id)}
+                        className={`w-full py-2 px-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
                           isActive
                             ? 'bg-amber-500 text-stone-950 shadow-md font-bold'
                             : 'text-stone-400 hover:bg-stone-800 hover:text-stone-200'
                         }`}
                       >
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-2">
                           <IconComponent className="w-4 h-4 shrink-0" />
                           <span>{item.label}</span>
                         </div>
@@ -524,7 +571,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             {/* Group 2: Website CMS & Media */}
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 block px-3 mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 block px-2.5 mb-1.5">
                 Website CMS & Content
               </span>
               <div className="space-y-1">
@@ -536,14 +583,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     return (
                       <button
                         key={item.id}
-                        onClick={() => setActiveTab(item.id)}
-                        className={`w-full py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
+                        onClick={() => handleSelectTab(item.id)}
+                        className={`w-full py-2 px-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
                           isActive
                             ? 'bg-amber-500 text-stone-950 shadow-md font-bold'
                             : 'text-stone-400 hover:bg-stone-800 hover:text-stone-200'
                         }`}
                       >
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-2">
                           <IconComponent className="w-4 h-4 shrink-0" />
                           <span>{item.label}</span>
                         </div>
@@ -565,7 +612,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
 
         {/* Sidebar Footer Controls */}
-        <div className="pt-4 border-t border-stone-800/80 space-y-2">
+        <div className="pt-3 border-t border-stone-800/80 space-y-2">
           <button
             onClick={fetchBookingsAndInquiries}
             disabled={loading}
@@ -582,7 +629,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 showNotification('Website CMS restored to defaults!');
               }
             }}
-            className="w-full py-1.5 px-3 rounded-xl text-stone-500 hover:text-rose-400 hover:bg-rose-950/20 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-colors"
+            className="w-full py-1 px-3 rounded-xl text-stone-500 hover:text-rose-400 hover:bg-rose-950/20 text-[10px] font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
           >
             <RotateCcw className="w-3 h-3" />
             <span>Reset CMS Defaults</span>
@@ -590,13 +637,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       </aside>
 
+      {/* Backdrop for Mobile Drawer */}
+      {mobileDrawerOpen && (
+        <div
+          onClick={() => setMobileDrawerOpen(false)}
+          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
+        ></div>
+      )}
+
       {/* MAIN CONTENT AREA */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-h-screen">
         {/* Top Breadcrumb Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-stone-800">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 mb-6 border-b border-stone-800">
           <div>
             <h1 className="font-serif-luxury text-xl sm:text-2xl font-bold text-stone-100 flex items-center gap-2">
-              <span>{sidebarMenuItems.find((m) => m.id === activeTab)?.label}</span>
+              <span>{currentActiveItem?.label}</span>
             </h1>
             <p className="text-xs text-stone-400 mt-0.5">
               Live Real-Time Management for Hotel Surya Residency (Vindhyanagar, Singrauli)
@@ -606,7 +661,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>All Systems Online</span>
+              <span>Live CMS Active</span>
             </span>
           </div>
         </div>
@@ -658,9 +713,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Quick CMS Jump Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div
-                onClick={() => setActiveTab('rooms_cms')}
+                onClick={() => handleSelectTab('rooms_cms')}
                 className="p-5 rounded-2xl bg-stone-900/80 border border-stone-800 hover:border-amber-500/50 transition-all cursor-pointer space-y-2"
               >
                 <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
@@ -675,7 +730,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               <div
-                onClick={() => setActiveTab('menu_cms')}
+                onClick={() => handleSelectTab('menu_cms')}
                 className="p-5 rounded-2xl bg-stone-900/80 border border-stone-800 hover:border-amber-500/50 transition-all cursor-pointer space-y-2"
               >
                 <div className="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold">
@@ -690,7 +745,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               <div
-                onClick={() => setActiveTab('media_cms')}
+                onClick={() => handleSelectTab('media_cms')}
                 className="p-5 rounded-2xl bg-stone-900/80 border border-stone-800 hover:border-amber-500/50 transition-all cursor-pointer space-y-2"
               >
                 <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
@@ -751,14 +806,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   className="px-3 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Print Register</span>
+                  <span>Print</span>
                 </button>
               </div>
             </div>
 
             {/* Bookings Table */}
             <div className="rounded-2xl bg-stone-900 border border-stone-800 overflow-x-auto shadow-xl">
-              <table className="w-full text-left text-xs text-stone-300">
+              <table className="w-full text-left text-xs text-stone-300 min-w-[650px]">
                 <thead className="bg-stone-950 text-stone-400 uppercase tracking-wider font-semibold border-b border-stone-800">
                   <tr>
                     <th className="p-4">Ref & Guest</th>
@@ -766,7 +821,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <th className="p-4">Assigned Room</th>
                     <th className="p-4">Amount & Payment</th>
                     <th className="p-4">Status</th>
-                    <th className="p-4 text-right">Guest WhatsApp Actions</th>
+                    <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-800/80">
@@ -935,7 +990,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* 3. ADD WALKIN TAB */}
         {activeTab === 'walkin' && (
-          <div className="max-w-2xl rounded-2xl bg-stone-900 border border-stone-800 p-6 sm:p-8 shadow-xl">
+          <div className="max-w-2xl rounded-2xl bg-stone-900 border border-stone-800 p-5 sm:p-8 shadow-xl">
             <h3 className="font-serif-luxury text-xl font-bold text-stone-100 mb-2">
               Add New Walk-In / Phone Reservation
             </h3>
@@ -1072,7 +1127,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {activeTab === 'inquiries' && (
           <div className="space-y-4">
             <div className="rounded-2xl bg-stone-900 border border-stone-800 overflow-x-auto shadow-xl">
-              <table className="w-full text-left text-xs text-stone-300">
+              <table className="w-full text-left text-xs text-stone-300 min-w-[650px]">
                 <thead className="bg-stone-950 text-stone-400 uppercase tracking-wider font-semibold border-b border-stone-800">
                   <tr>
                     <th className="p-4">Client Name & Phone</th>
@@ -1154,7 +1209,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* 5. ROOMS & TARIFFS CMS */}
         {activeTab === 'rooms_cms' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="font-serif-luxury text-lg font-bold text-stone-100">
                   Rooms & Suites Management
@@ -1186,7 +1241,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     featured: false,
                   })
                 }
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add New Room Category</span>
@@ -1197,13 +1252,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {localRooms.map((room) => (
                 <div
                   key={room.id}
-                  className="p-5 rounded-2xl bg-stone-900 border border-stone-800 flex flex-col justify-between space-y-4 hover:border-amber-500/40 transition-colors"
+                  className="p-4 sm:p-5 rounded-2xl bg-stone-900 border border-stone-800 flex flex-col justify-between space-y-4 hover:border-amber-500/40 transition-colors"
                 >
-                  <div className="flex gap-4">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                     <img
                       src={room.image}
                       alt={room.name}
-                      className="w-24 h-24 rounded-xl object-cover shrink-0 border border-stone-800"
+                      className="w-full sm:w-24 h-40 sm:h-24 rounded-xl object-cover shrink-0 border border-stone-800"
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
@@ -1231,8 +1286,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
 
                   <div className="pt-3 border-t border-stone-800 flex items-center justify-between">
-                    <span className="text-xs text-stone-400 font-medium">
-                      {room.bedType} • {room.size}
+                    <span className="text-xs text-stone-400 font-medium truncate max-w-[150px]">
+                      {room.bedType}
                     </span>
                     <div className="flex items-center gap-2">
                       <button
@@ -1244,7 +1299,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </button>
                       <button
                         onClick={() => handleDeleteRoom(room.id)}
-                        className="p-1.5 rounded-lg bg-rose-950/50 hover:bg-rose-900 text-rose-400 text-xs"
+                        className="p-1.5 rounded-lg bg-rose-950/50 hover:bg-rose-900 text-rose-400 text-xs cursor-pointer"
                         title="Delete Room"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1260,7 +1315,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* 6. SURYA RASOI MENU CMS */}
         {activeTab === 'menu_cms' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="font-serif-luxury text-lg font-bold text-stone-100">
                   Surya Rasoi Restaurant Menu CMS
@@ -1282,14 +1337,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     isChefSpecial: true,
                   })
                 }
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add New Dish</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {localMenuItems.map((item) => (
                 <div
                   key={item.id}
@@ -1336,14 +1391,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setEditingMenuItem(item)}
-                        className="px-3 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-amber-300 text-xs font-bold flex items-center gap-1"
+                        className="px-3 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-amber-300 text-xs font-bold flex items-center gap-1 cursor-pointer"
                       >
                         <Edit2 className="w-3 h-3" />
                         <span>Edit</span>
                       </button>
                       <button
                         onClick={() => handleDeleteMenuItem(item.id)}
-                        className="p-1 rounded-lg bg-rose-950/50 hover:bg-rose-900 text-rose-400"
+                        className="p-1 rounded-lg bg-rose-950/50 hover:bg-rose-900 text-rose-400 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -1358,7 +1413,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* 7. PHOTOS & MEDIA CMS */}
         {activeTab === 'media_cms' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="font-serif-luxury text-lg font-bold text-stone-100">
                   Photos & Media Gallery CMS
@@ -1379,7 +1434,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
                   })
                 }
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md"
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Photo / Video</span>
@@ -1441,17 +1496,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* 8. BANQUETS CMS */}
         {activeTab === 'banquets_cms' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-serif-luxury text-lg font-bold text-stone-100">
-                  Banquets, Ballrooms & Meeting Halls CMS
-                </h3>
-                <p className="text-xs text-stone-400">
-                  Manage banquet capacities, descriptions, features, and venue cover images.
-                </p>
-              </div>
-            </div>
-
+            <h3 className="font-serif-luxury text-lg font-bold text-stone-100">
+              Banquets, Ballrooms & Meeting Halls CMS
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {localBanquets.map((hall) => (
                 <div
@@ -1495,7 +1542,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* 9. HERO & PAGE CONTENT CMS */}
         {activeTab === 'hero_cms' && (
-          <div className="max-w-3xl rounded-2xl bg-stone-900 border border-stone-800 p-6 sm:p-8 space-y-5">
+          <div className="max-w-3xl rounded-2xl bg-stone-900 border border-stone-800 p-5 sm:p-8 space-y-5">
             <h3 className="font-serif-luxury text-xl font-bold text-stone-100 mb-2">
               Hero Header & Welcome Section Content
             </h3>
@@ -1597,8 +1644,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <h3 className="font-serif-luxury text-lg font-bold text-stone-100">
               Hotel Facilities & Amenities CMS
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {localAmenities.map((amenity, idx) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {localAmenities.map((amenity) => (
                 <div
                   key={amenity.id}
                   className="p-4 rounded-2xl bg-stone-900 border border-stone-800 space-y-2"
@@ -1622,7 +1669,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <h3 className="font-serif-luxury text-lg font-bold text-stone-100">
               Guest Reviews & Feedback Management
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {localReviews.map((rev) => (
                 <div
                   key={rev.id}
@@ -1648,7 +1695,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <h3 className="font-serif-luxury text-lg font-bold text-stone-100">
               Landmarks & Navigation Routes CMS
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {localDestinations.map((dest) => (
                 <div
                   key={dest.id}
@@ -1672,7 +1719,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* 13. SETTINGS & WHATSAPP CONFIG */}
         {activeTab === 'settings_cms' && (
-          <div className="max-w-3xl rounded-2xl bg-stone-900 border border-stone-800 p-6 sm:p-8 space-y-5 shadow-xl">
+          <div className="max-w-3xl rounded-2xl bg-stone-900 border border-stone-800 p-5 sm:p-8 space-y-5 shadow-xl">
             <h3 className="font-serif-luxury text-xl font-bold text-stone-100 mb-2">
               Hotel Details & WhatsApp Dispatch Configuration
             </h3>
